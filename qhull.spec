@@ -1,19 +1,18 @@
-%define name	qhull
-%define version	2003.1
-%define release	%mkrel 3
-%define major	0
-%define libname	%mklibname %{name} %{major}
+%define major        0
+%define libname      %mklibname %{name} %{major}
+%define libnamedev   %mklibname %{name} %{major} -d
+%define libnamesdev  %mklibname %{name} %{major} -d -s
 
-Summary:	Computes convex hulls
-Name:		%{name}
-Version:	%{version}
-Release:	%{release}
-Epoch:		0
-License:	GPL
-Group:		System/Libraries
-Url:		http://www.qhull.org/
-Source0:	%{url}files/%{name}-%{version}-src.tar.bz2
-BuildRoot:	%{_tmppath}/%{name}-buildroot
+Name:           qhull
+Version:        2003.1
+Release:        %mkrel 4
+Epoch:          0
+Summary:        Compute convex hulls
+License:        GPL
+Group:          System/Libraries
+URL:            http://www.qhull.org/
+Source0:        http://www.qhull.org/files/%{name}-%{version}-src.tar.bz2
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 Qhull computes convex hulls, Delaunay triangulations, halfspace
@@ -24,9 +23,8 @@ computing the convex hull. Qhull handles roundoff errors from floating
 point arithmetic. It can approximate a convex hull.
 
 %package -n %{libname}
-Summary:	Shared libraries for %{name}
-Group:		System/Libraries
-Provides:	lib%{name} = %{epoch}:%{version}-%{release}
+Summary:        Shared libraries for %{name}
+Group:          System/Libraries
 
 %description -n %{libname}
 Qhull computes convex hulls, Delaunay triangulations, Voronoi diagrams,
@@ -41,13 +39,26 @@ execution statistics.
 
 This package provide shared libraries for %{name}.
 
-%package -n %{libname}-devel
-Summary:	Header files and static library for development with %{name}
-Group:		Development/C
-Requires:	%{libname} = %{epoch}:%{version}-%{release}
-Provides:	lib%{name}-devel = %{epoch}:%{version}-%{release}
+%package -n %{libnamedev}
+Summary:        Header files and libraries for development with %{name}
+Group:          Development/C
+Requires:       %{libname} = %{epoch}:%{version}-%{release}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{release}
+Provides:       lib%{name}-devel = %{epoch}:%{version}-%{release}
+Provides:       %{_lib}%{name}-devel = %{epoch}:%{version}-%{release}
 
-%description -n %{libname}-devel
+%description -n %{libnamedev}
+Header files and libraries for development with %{name}.
+
+%package -n %{libnamesdev}
+Summary:        Static library for development with %{name}
+Group:          Development/C
+Requires:       %{libnamedev} = %{epoch}:%{version}-%{release}
+Provides:       %{name}-static-devel = %{epoch}:%{version}-%{release}
+Provides:       lib%{name}-static-devel = %{epoch}:%{version}-%{release}
+Provides:       %{_lib}%{name}-static-devel = %{epoch}:%{version}-%{release}
+
+%description -n %{libnamesdev}
 Header files and static library for development with %{name}.
 
 %prep
@@ -57,24 +68,24 @@ Header files and static library for development with %{name}.
 %build
 pushd src
 sh ./Make-config.sh || :
-touch MBorland Makefile.txt
+/bin/touch MBorland Makefile.txt
 popd
 
 %{__perl} -pi -e 's|AM_INIT_AUTOMAKE\(qhull, 2002.1\)|AM_INIT_AUTOMAKE(%{name}, %{version})|' configure.in
 %{__perl} -pi -e 's|^AC_PROG_LIBTOOL|AM_PROG_LIBTOOL|' configure.in
 
-touch NEWS README AUTHORS ChangeLog
-autoreconf --verbose --force --install
+/bin/touch NEWS README AUTHORS ChangeLog
+%{_bindir}/autoreconf --verbose --f --i
 
-%configure
-%make
+%{configure2_5x}
+%{make}
 
 %install
 %{__rm} -rf %{buildroot}
-%makeinstall
+%{makeinstall}
 %{__rm} -rf %{buildroot}/usr/share/doc
 
-%{__perl} -pi -e 's|\r||g' *.txt html/*.{1,htm,man,txt}
+%{__perl} -pi -e 's|\r$||g' *.txt html/*.{1,htm,man,txt}
 
 %clean
 %{__rm} -rf %{buildroot}
@@ -82,16 +93,29 @@ autoreconf --verbose --force --install
 %post -n %{libname} -p /sbin/ldconfig
 %postun -n %{libname} -p /sbin/ldconfig
 
-%files -n %{libname}
-%defattr(-, root, root)
+%files
+%defattr(-,root,root)
 %doc Announce.txt COPYING.txt README.txt REGISTER.txt
+%{_bindir}/qconvex
+%{_bindir}/qdelaunay
+%{_bindir}/qhalf
+%{_bindir}/qhull
+%{_bindir}/qvoronoi
+%{_bindir}/rbox
+%{_mandir}/man1/qhull.1*
+%{_mandir}/man1/rbox.1*
+
+%files -n %{libname}
+%defattr(-,root,root)
 %{_libdir}/*.so.*
 
-%files -n %{libname}-devel
-%defattr(-, root, root)
+%files -n %{libnamedev}
+%defattr(-,root,root)
 %doc html
-%{_bindir}/*
-%{_mandir}/*/*
+%{_libdir}/*.la
 %{_libdir}/*.so
-%{_libdir}/*.*a
 %{_includedir}/*
+
+%files -n %{libnamesdev}
+%defattr(-,root,root)
+%{_libdir}/*.a
