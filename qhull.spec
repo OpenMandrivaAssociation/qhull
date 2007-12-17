@@ -12,7 +12,6 @@ License:        GPL
 Group:          System/Libraries
 URL:            http://www.qhull.org/
 Source0:        http://www.qhull.org/files/%{name}-%{version}-src.tar.bz2
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 Qhull computes convex hulls, Delaunay triangulations, halfspace
