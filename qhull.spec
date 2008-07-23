@@ -5,7 +5,7 @@
 
 Name:           qhull
 Version:        2003.1
-Release:        %mkrel 5
+Release:        %mkrel 7
 Epoch:          0
 Summary:        Compute convex hulls
 License:        GPL
