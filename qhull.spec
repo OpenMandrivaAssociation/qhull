@@ -11,6 +11,7 @@ License:	GPL
 Group:		System/Libraries
 URL:		http://www.qhull.org/
 Source0:	http://www.qhull.org/files/%{name}-%{version}-src.tgz
+BuildRequires:	cmake
 Patch0:		qhull-2012.1-format.patch
 
 %description
@@ -44,6 +45,7 @@ Group:		Development/C
 Requires:	%{libqhull} = %{EVRD}
 Provides:	%{name}-devel = %{EVRD}
 Provides:	lib%{name}-devel = %{EVRD}
+Obsoletes:	%{mklibname qhull 0 -d}
 
 %description	-n %{libqhull_devel}
 Header files and libraries for development with %{name}.
@@ -54,6 +56,7 @@ Group:		Development/C
 Requires:	%{libqhull_devel} = %{EVRD}
 Provides:	%{name}-static-devel = %{EVRD}
 Provides:	lib%{name}-static-devel = %{EVRD}
+Obsoletes:	%{mklibname qhull 0 -d -s}
 
 %description	-n %{libqhull_static_devel}
 Header files and static library for development with %{name}.
