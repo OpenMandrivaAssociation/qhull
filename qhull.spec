@@ -5,7 +5,7 @@
 
 Name:           qhull
 Version:        2003.1
-Release:        %mkrel 8
+Release:        %mkrel 9
 Epoch:          0
 Summary:        Compute convex hulls
 License:        GPL
@@ -13,6 +13,8 @@ Group:          System/Libraries
 URL:            http://www.qhull.org/
 Source0:        http://www.qhull.org/files/%{name}-%{version}-src.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
+
+Patch0:		qhull-2003.1-format.patch
 
 %description
 Qhull computes convex hulls, Delaunay triangulations, halfspace
@@ -64,6 +66,8 @@ Header files and static library for development with %{name}.
 %prep
 %setup -q
 %{__perl} -pi -e 's|\r||g' configure.in Makefile.am src/Makefile.am src/Make-config.sh
+
+%patch0 -p1
 
 %build
 pushd src
