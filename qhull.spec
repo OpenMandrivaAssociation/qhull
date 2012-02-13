@@ -5,7 +5,7 @@
 
 Name:		qhull
 Version:	2012.1
-Release:	1
+Release:	2
 Summary:	Compute convex hulls
 License:	GPL
 Group:		System/Libraries
@@ -82,6 +82,10 @@ popd
 make -C build install
 mkdir -p %{buildroot}%{_docdir}/%{name}
 cp -fpa html %{buildroot}%{_docdir}/%{name}
+
+# add some symlinks to satisfy octave configure
+ln -sf libqhull %{buildroot}%{_includedir}/qhull
+ln -sf libqhull.h %{buildroot}%{_includedir}/qhull/qhull.h
 
 %files
 %doc Announce.txt COPYING.txt README.txt REGISTER.txt
