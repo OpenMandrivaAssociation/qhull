@@ -1,20 +1,17 @@
-%define major        0
-%define libname      %mklibname %{name} %{major}
-%define libnamedev   %mklibname %{name} %{major} -d
-%define libnamesdev  %mklibname %{name} %{major} -d -s
+%define qhull_major		6
+%define libqhull		%mklibname %{name} %{qhull_major}
+%define libqhull_devel		%mklibname %{name} -d
+%define libqhull_static_devel	%mklibname %{name} -d -s
 
-Name:           qhull
-Version:        2003.1
-Release:        %mkrel 9
-Epoch:          0
-Summary:        Compute convex hulls
-License:        GPL
-Group:          System/Libraries
-URL:            http://www.qhull.org/
-Source0:        http://www.qhull.org/files/%{name}-%{version}-src.tar.bz2
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
-
-Patch0:		qhull-2003.1-format.patch
+Name:		qhull
+Version:	2012.1
+Release:	1
+Summary:	Compute convex hulls
+License:	GPL
+Group:		System/Libraries
+URL:		http://www.qhull.org/
+Source0:	http://www.qhull.org/files/%{name}-%{version}-src.tgz
+Patch0:		qhull-2012.1-format.patch
 
 %description
 Qhull computes convex hulls, Delaunay triangulations, halfspace
@@ -24,11 +21,11 @@ triangulations, and furthest-site Voronoi diagrams. It runs in 2-d, 3-d,
 computing the convex hull. Qhull handles roundoff errors from floating
 point arithmetic. It can approximate a convex hull.
 
-%package -n %{libname}
-Summary:        Shared libraries for %{name}
-Group:          System/Libraries
+%package	-n %{libqhull}
+Summary:	Shared libraries for %{name}
+Group:		System/Libraries
 
-%description -n %{libname}
+%description	-n %{libqhull}
 Qhull computes convex hulls, Delaunay triangulations, Voronoi diagrams,
 furthest-site Voronoi diagrams, and halfspace intersections about a point.
 It runs in 2-d, 3-d, 4-d, or higher.  It implements the Quickhull algorithm
@@ -41,89 +38,69 @@ execution statistics.
 
 This package provide shared libraries for %{name}.
 
-%package -n %{libnamedev}
-Summary:        Header files and libraries for development with %{name}
-Group:          Development/C
-Requires:       %{libname} = %{epoch}:%{version}-%{release}
-Provides:       %{name}-devel = %{epoch}:%{version}-%{release}
-Provides:       lib%{name}-devel = %{epoch}:%{version}-%{release}
-Provides:       %{_lib}%{name}-devel = %{epoch}:%{version}-%{release}
+%package	-n %{libqhull_devel}
+Summary:	Header files and libraries for development with %{name}
+Group:		Development/C
+Requires:	%{libqhull} = %{EVRD}
+Provides:	%{name}-devel = %{EVRD}
+Provides:	lib%{name}-devel = %{EVRD}
 
-%description -n %{libnamedev}
+%description	-n %{libqhull_devel}
 Header files and libraries for development with %{name}.
 
-%package -n %{libnamesdev}
-Summary:        Static library for development with %{name}
-Group:          Development/C
-Requires:       %{libnamedev} = %{epoch}:%{version}-%{release}
-Provides:       %{name}-static-devel = %{epoch}:%{version}-%{release}
-Provides:       lib%{name}-static-devel = %{epoch}:%{version}-%{release}
-Provides:       %{_lib}%{name}-static-devel = %{epoch}:%{version}-%{release}
+%package	-n %{libqhull_static_devel}
+Summary:	Static library for development with %{name}
+Group:		Development/C
+Requires:	%{libqhull_devel} = %{EVRD}
+Provides:	%{name}-static-devel = %{EVRD}
+Provides:	lib%{name}-static-devel = %{EVRD}
 
-%description -n %{libnamesdev}
+%description	-n %{libqhull_static_devel}
 Header files and static library for development with %{name}.
 
 %prep
 %setup -q
-%{__perl} -pi -e 's|\r||g' configure.in Makefile.am src/Makefile.am src/Make-config.sh
-
 %patch0 -p1
 
 %build
-pushd src
-sh ./Make-config.sh || :
-/bin/touch MBorland Makefile.txt
+export CFLAGS="%{optflags}"
+export CXXFLAGS="%{optflags}"
+pushd build
+    cmake							\
+	-DCMAKE_INSTALL_PREFIX:PATH=%{buildroot}%{_prefix}	\
+	-DLIB_INSTALL_DIR:PATH=%{buildroot}%{_libdir}		\
+	-DMAN_INSTALL_DIR:PATH=%{buildroot}%{_mandir}/man1	\
+	-DDOC_INSTALL_DIR:PATH=%{buildroot}%{_docdir}/%{name}	\
+	 ..
+    %make
 popd
 
-%{__perl} -pi -e 's|AM_INIT_AUTOMAKE\(qhull, 2002.1\)|AM_INIT_AUTOMAKE(%{name}, %{version})|' configure.in
-%{__perl} -pi -e 's|^AC_PROG_LIBTOOL|AM_PROG_LIBTOOL|' configure.in
-
-/bin/touch NEWS README AUTHORS ChangeLog
-%{_bindir}/autoreconf --verbose --f --i
-
-%{configure2_5x}
-%{make}
-
 %install
-%{__rm} -rf %{buildroot}
-%{makeinstall}
-%{__rm} -rf %{buildroot}/usr/share/doc
-
-%{__perl} -pi -e 's|\r$||g' *.txt html/*.{1,htm,man,txt}
-
-%clean
-%{__rm} -rf %{buildroot}
-
-%if %mdkversion < 200900
-%post -n %{libname} -p /sbin/ldconfig
-%endif
-%if %mdkversion < 200900
-%postun -n %{libname} -p /sbin/ldconfig
-%endif
+make -C build install
+mkdir -p %{buildroot}%{_docdir}/%{name}
+cp -fpa html %{buildroot}%{_docdir}/%{name}
 
 %files
-%defattr(-,root,root)
 %doc Announce.txt COPYING.txt README.txt REGISTER.txt
-%{_bindir}/qconvex
-%{_bindir}/qdelaunay
-%{_bindir}/qhalf
-%{_bindir}/qhull
-%{_bindir}/qvoronoi
-%{_bindir}/rbox
+%{_bindir}/qconvex*
+%{_bindir}/qdelaunay*
+%{_bindir}/qhalf*
+%{_bindir}/qhull*
+%{_bindir}/qvoronoi*
+%{_bindir}/rbox*
+%{_bindir}/testqset*
+%{_bindir}/user_eg*
 %{_mandir}/man1/qhull.1*
 %{_mandir}/man1/rbox.1*
+%exclude %{_docdir}/%{name}/html
 
-%files -n %{libname}
-%defattr(-,root,root)
-%{_libdir}/*.so.*
+%files		-n %{libqhull}
+%{_libdir}/*.so.%{qhull_major}*
 
-%files -n %{libnamedev}
-%defattr(-,root,root)
-%doc html
-%{_libdir}/*.la
+%files		-n %{libqhull_devel}
 %{_libdir}/*.so
 %{_includedir}/*
+%doc %{_docdir}/%{name}/html
 
-%files -n %{libnamesdev}
-%defattr(-,root,root)
+%files		-n %{libqhull_static_devel}
 %{_libdir}/*.a
