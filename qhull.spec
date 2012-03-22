@@ -5,7 +5,7 @@
 
 Name:		qhull
 Version:	2012.1
-Release:	2
+Release:	3
 Summary:	Compute convex hulls
 License:	GPL
 Group:		System/Libraries
@@ -46,6 +46,12 @@ Requires:	%{libqhull} = %{EVRD}
 Provides:	%{name}-devel = %{EVRD}
 Provides:	lib%{name}-devel = %{EVRD}
 Obsoletes:	%{mklibname qhull 0 -d}
+
+%pretrans	-n %{libqhull_devel}
+    if [ -d %{_includedir}/qhull ]; then
+	mv %{_includedir}/qhull %{_includedir}/qhull.rpmsave
+	ln -s %{_includedir}/qhull.rpmsave %{name}
+    fi
 
 %description	-n %{libqhull_devel}
 Header files and libraries for development with %{name}.
