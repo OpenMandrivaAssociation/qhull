@@ -5,12 +5,13 @@
 
 Name:		qhull
 Version:	2012.1
-Release:	3
+Release:	4
 Summary:	Compute convex hulls
 License:	GPL
 Group:		System/Libraries
 URL:		http://www.qhull.org/
 Source0:	http://www.qhull.org/files/%{name}-%{version}-src.tgz
+Source100:	qhull.rpmlintrc
 BuildRequires:	cmake
 Patch0:		qhull-2012.1-format.patch
 
