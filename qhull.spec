@@ -5,7 +5,7 @@
 
 Name:		qhull
 Version:	2012.1
-Release:	6
+Release:	7
 Summary:	Compute convex hulls
 License:	GPL
 Group:		System/Libraries
