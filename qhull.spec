@@ -1,19 +1,18 @@
-%define qhull_major		6
+%define qhull_major		%(echo %{version} |cut -d. -f2)
 %define libqhull		%mklibname %{name} %{qhull_major}
 %define libqhull_devel		%mklibname %{name} -d
 %define libqhull_static_devel	%mklibname %{name} -d -s
 
 Name:		qhull
-Version:	2012.1
-Release:	7
+Version:	2015.7.2.0
+Release:	1
 Summary:	Compute convex hulls
 License:	GPL
 Group:		System/Libraries
 URL:		http://www.qhull.org/
-Source0:	http://www.qhull.org/files/%{name}-%{version}-src.tgz
+Source0:	http://www.qhull.org/download/%{name}-%(echo %{version} |cut -d. -f1)-src-%(echo %{version} |cut -d. -f2-).tgz
 Source100:	qhull.rpmlintrc
 BuildRequires:	cmake
-Patch0:		qhull-2012.1-format.patch
 
 %description
 Qhull computes convex hulls, Delaunay triangulations, halfspace
@@ -69,8 +68,8 @@ Obsoletes:	%{mklibname qhull 0 -d -s}
 Header files and static library for development with %{name}.
 
 %prep
-%setup -q
-%patch0 -p1
+%setup -qn %{name}-%(echo %{version} |cut -d. -f1).%(echo %{version} |cut -d. -f3)
+%apply_patches
 
 %build
 export CFLAGS="%{optflags}"
@@ -102,8 +101,6 @@ ln -sf libqhull.h %{buildroot}%{_includedir}/qhull/qhull.h
 %{_bindir}/qhull*
 %{_bindir}/qvoronoi*
 %{_bindir}/rbox*
-%{_bindir}/testqset*
-%{_bindir}/user_eg*
 %{_mandir}/man1/qhull.1*
 %{_mandir}/man1/rbox.1*
 %exclude %{_docdir}/%{name}/html
@@ -118,60 +115,3 @@ ln -sf libqhull.h %{buildroot}%{_includedir}/qhull/qhull.h
 
 %files		-n %{libqhull_static_devel}
 %{_libdir}/*.a
-
-
-%changelog
-* Thu Mar 22 2012 Paulo Andrade <pcpa@mandriva.com.br> 2012.1-3
-+ Revision: 786061
-- Add better handling for upgrade from previous qhull version package.
-
-* Mon Feb 13 2012 Paulo Andrade <pcpa@mandriva.com.br> 2012.1-2
-+ Revision: 773862
-- Add symlinks for better compatibility with qhull 2003.1.
-
-* Mon Feb 13 2012 Paulo Andrade <pcpa@mandriva.com.br> 2012.1-1
-+ Revision: 773723
-- Update to latest upstream release.
-
-* Mon Feb 13 2012 Paulo Andrade <pcpa@mandriva.com.br> 0:2003.1-9
-+ Revision: 773716
-- Rebuild.
-
-  + Thierry Vignaud <tv@mandriva.org>
-    - rebuild
-    - rebuild
-    - kill re-definition of %%buildroot on Pixel's request
-
-  + Pixel <pixel@mandriva.com>
-    - do not call ldconfig in %%post/%%postun, it is now handled by filetriggers
-
-  + Olivier Blin <blino@mandriva.org>
-    - restore BuildRoot
-
-* Thu Jun 07 2007 Anssi Hannula <anssi@mandriva.org> 0:2003.1-5mdv2008.0
-+ Revision: 36194
-- rebuild with correct optflags
-
-* Tue Jun 05 2007 David Walluck <walluck@mandriva.org> 0:2003.1-4mdv2008.0
-+ Revision: 35740
-- add bins and manpages to their own package
-- add static-devel paackage
-- devel package now provides %%{name}-devel
-- Import qhull
-
-
-
-* Sat Nov 26 2005 Thierry Vignaud <tvignaud@mandriva.com> 2003.1-3mdk
-- fix description (#16369)
-
-* Wed Nov 02 2005 David Walluck <walluck@linux-mandrake.com> 0:2003.1-2mdk
-- fix build
-- update URL
-- fix %%doc
-
-* Fri Feb 13 2004 David Walluck <walluck@linux-mandrake.com> 0:2003.1-1mdk
-- 2003.1
-- add epoch to %%{libname} provides
-
-* Thu Oct 02 2003 David Walluck <walluck@linux-mandrake.com> 0:2002.1-1mdk
-- release
