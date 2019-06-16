@@ -24,8 +24,14 @@ point arithmetic. It can approximate a convex hull.
 
 %files
 %doc Announce.txt COPYING.txt README.txt REGISTER.txt
-%{_bindir}/*
-%{_mandir}/man1/*
+-%{_bindir}/qconvex*
+-%{_bindir}/qdelaunay*
+-%{_bindir}/qhalf*
+-%{_bindir}/qhull*
+-%{_bindir}/qvoronoi*
+-%{_bindir}/rbox*
+-%{_mandir}/man1/qhull.1*
+-%{_mandir}/man1/rbox.1*
 %exclude %{_docdir}/%{name}/html
 
 #---------------------------------------------------------------------------
@@ -106,7 +112,7 @@ Header files and static library for development with %{name}.
 %make_build
 
 %install
-%make_install
+%make_install -C build
 
 # docs html
 install -dm 0755 %{buildroot}%{_docdir}/%{name}/html
