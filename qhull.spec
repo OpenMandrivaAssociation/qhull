@@ -12,6 +12,7 @@ Group:		System/Libraries
 URL:		http://www.qhull.org/
 Source0:	http://www.qhull.org/download/%{name}-%(echo %{version} |cut -d. -f1)-src-%(echo %{version} |cut -d. -f2-).tgz
 Source100:	qhull.rpmlintrc
+Patch0:         %{name}-2015.2-html_doc_path.patch
 BuildRequires:	cmake
 
 %description
@@ -24,15 +25,15 @@ point arithmetic. It can approximate a convex hull.
 
 %files
 %doc Announce.txt COPYING.txt README.txt REGISTER.txt
--%{_bindir}/qconvex*
--%{_bindir}/qdelaunay*
--%{_bindir}/qhalf*
--%{_bindir}/qhull*
--%{_bindir}/qvoronoi*
--%{_bindir}/rbox*
--%{_mandir}/man1/qhull.1*
--%{_mandir}/man1/rbox.1*
-%exclude %{_docdir}/%{name}/html
+%{_bindir}/qconvex*
+%{_bindir}/qdelaunay*
+%{_bindir}/qhalf*
+%{_bindir}/qhull*
+%{_bindir}/qvoronoi*
+%{_bindir}/rbox*
+%{_mandir}/man1/qhull.1*
+%{_mandir}/man1/rbox.1*
+%exclude %{_docdir}/%{name}
 
 #---------------------------------------------------------------------------
 
@@ -103,20 +104,11 @@ Header files and static library for development with %{name}.
 %autopatch -p1
 
 %build
-%cmake								\
-	-DCMAKE_INSTALL_PREFIX:PATH=%{buildroot}%{_prefix}	\
-	-DLIB_INSTALL_DIR:PATH=%{buildroot}%{_libdir}		\
-	-DMAN_INSTALL_DIR:PATH=%{buildroot}%{_mandir}/man1	\
-	-DDOC_INSTALL_DIR:PATH=%{buildroot}%{_docdir}/%{name}	\
-	%{nil}
+%cmake
 %make_build
 
 %install
 %make_install -C build
-
-# docs html
-install -dm 0755 %{buildroot}%{_docdir}/%{name}/html
-cp -fpa html %{buildroot}%{_docdir}/%{name}/html
 
 # add some symlinks to satisfy octave configure
 ln -sf libqhull %{buildroot}%{_includedir}/qhull

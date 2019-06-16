@@ -1,0 +1,8 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -623,4 +623,4 @@
+ install(FILES html/qhull.man         DESTINATION ${MAN_INSTALL_DIR} RENAME qhull.1)
+ install(FILES html/rbox.man          DESTINATION ${MAN_INSTALL_DIR} RENAME rbox.1)
+ install(FILES ${doc_FILES}           DESTINATION ${DOC_INSTALL_DIR})
+-install(DIRECTORY html/              DESTINATION ${DOC_INSTALL_DIR})
++install(DIRECTORY html/              DESTINATION ${DOC_INSTALL_DIR}/html)
