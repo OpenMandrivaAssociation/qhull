@@ -100,27 +100,23 @@ Header files and static library for development with %{name}.
 
 %prep
 %setup -qn %{name}-%(echo %{version} |cut -d. -f1).%(echo %{version} |cut -d. -f3)
-%apply_patches
+%autopatch -p1
 
 %build
-export CFLAGS="%{optflags}"
-export CXXFLAGS="%{optflags}"
-#pushd build
 %cmake								\
 	-DCMAKE_INSTALL_PREFIX:PATH=%{buildroot}%{_prefix}	\
 	-DLIB_INSTALL_DIR:PATH=%{buildroot}%{_libdir}		\
 	-DMAN_INSTALL_DIR:PATH=%{buildroot}%{_mandir}/man1	\
 	-DDOC_INSTALL_DIR:PATH=%{buildroot}%{_docdir}/%{name}	\
-	 ..
+	%{nil}
 %make_build
-#popd
 
 %install
-%make_build -C build install
+%make_install
 
-# html docs
+# docs html
 install -dm 0755 %{buildroot}%{_docdir}/%{name}/html
-cp -fpa html %{buildroot}%{_docdir}/%{name}
+cp -fpa html %{buildroot}%{_docdir}/%{name}/html
 
 # add some symlinks to satisfy octave configure
 ln -sf libqhull %{buildroot}%{_includedir}/qhull
