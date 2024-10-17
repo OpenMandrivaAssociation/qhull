@@ -9,7 +9,7 @@ Release:	4
 Summary:	Compute convex hulls
 License:	GPL
 Group:		System/Libraries
-URL:		http://www.qhull.org/
+URL:		https://www.qhull.org/
 Source0:	http://www.qhull.org/download/%{name}-%(echo %{version} |cut -d. -f1)-src-%(echo %{version} |cut -d. -f2-).tgz
 Source100:	qhull.rpmlintrc
 Patch0:         %{name}-2015.2-html_doc_path.patch
