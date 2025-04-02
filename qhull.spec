@@ -3,17 +3,20 @@
 %define libqhull_devel		%mklibname %{name} -d
 %define libqhull_static_devel	%mklibname %{name} -d -s
 
+%bcond_without	shared_lib
+%bcond_without	static_lib
+
 Name:		qhull
-Version:	2015.7.2.0
-Release:	4
+Version:	2020.8.0.2
+Release:	1
 Summary:	Compute convex hulls
 License:	GPL
 Group:		System/Libraries
 URL:		https://www.qhull.org/
 Source0:	http://www.qhull.org/download/%{name}-%(echo %{version} |cut -d. -f1)-src-%(echo %{version} |cut -d. -f2-).tgz
+Patch0:		qhull-2020-8.0.2-fix_path.patch
 Source100:	qhull.rpmlintrc
-Patch0:         %{name}-2015.2-html_doc_path.patch
-BuildRequires:	cmake
+BuildRequires:	cmake ninja
 
 %description
 Qhull computes convex hulls, Delaunay triangulations, halfspace
@@ -65,7 +68,7 @@ Group:		Development/C
 Requires:	%{libqhull} = %{EVRD}
 Provides:	%{name}-devel = %{EVRD}
 Provides:	lib%{name}-devel = %{EVRD}
-Obsoletes:	%{mklibname qhull 0 -d}
+Obsoletes:	%{mklibname qhull 0 -d} < %{version}
 
 %description -n %{libqhull_devel}
 Header files and libraries for development with %{name}.
@@ -73,43 +76,41 @@ Header files and libraries for development with %{name}.
 %files -n %{libqhull_devel}
 %{_libdir}/*.so
 %{_includedir}/*
+%dir %{_libdir}/cmake/Qhull
+%{_libdir}/cmake/Qhull/*.cmake
+%{_libdir}/pkgconfig/qhull*.pc
 %doc %{_docdir}/%{name}/html
-
-%pretrans -n %{libqhull_devel}
-if [ -d %{_includedir}/qhull ]; then
-	mv %{_includedir}/qhull %{_includedir}/qhull.rpmsave
-	ln -s %{_includedir}/qhull.rpmsave %{name}
-fi
 
 #---------------------------------------------------------------------------
 
+%if %{with static_lib}
 %package -n %{libqhull_static_devel}
 Summary:	Static library for development with %{name}
 Group:		Development/C
 Requires:	%{libqhull_devel} = %{EVRD}
 Provides:	%{name}-static-devel = %{EVRD}
 Provides:	lib%{name}-static-devel = %{EVRD}
-Obsoletes:	%{mklibname qhull 0 -d -s}
+Obsoletes:	%{mklibname qhull 0 -d -s} < %{version}
 
 %description -n %{libqhull_static_devel}
 Header files and static library for development with %{name}.
 
 %files -n %{libqhull_static_devel}
 %{_libdir}/*.a
+%endif
 
 #---------------------------------------------------------------------------
 
 %prep
-%setup -qn %{name}-%(echo %{version} |cut -d. -f1).%(echo %{version} |cut -d. -f3)
-%autopatch -p1
+%autosetup -p1 -n %{name}-%(echo %{version} |cut -d. -f1).%(echo %{version} |cut -d. -f4)
 
 %build
-%cmake
-%make_build
+%cmake \
+	-DBUILD_SHARED_LIBS:BOOL=%{?with_shared_lib:ON}%{?!with_shared_lib:OFF} \
+	-DBUILD_STATIC_LIBS:BOOL=%{?with_static_lib:ON}%{?!with_static_lib:OFF} \
+	-GNinja
+%ninja_build
 
 %install
-%make_install -C build
+%ninja_install -C build
 
-# add some symlinks to satisfy octave configure
-ln -sf libqhull %{buildroot}%{_includedir}/qhull
-ln -sf libqhull.h %{buildroot}%{_includedir}/qhull/qhull.h
