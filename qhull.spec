@@ -1,5 +1,6 @@
 %define qhull_major		%(echo %{version} |cut -d. -f2)
-%define libqhull		%mklibname %{name} %{qhull_major}
+%define libqhull		%mklibname %{name}
+%define oldlibqhull		%mklibname %{name} 8
 %define libqhull_devel		%mklibname %{name} -d
 %define libqhull_static_devel	%mklibname %{name} -d -s
 
@@ -8,7 +9,7 @@
 
 Name:		qhull
 Version:	2020.8.0.2
-Release:	1
+Release:	2
 Summary:	Compute convex hulls
 License:	GPL
 Group:		System/Libraries
@@ -43,6 +44,7 @@ point arithmetic. It can approximate a convex hull.
 %package -n %{libqhull}
 Summary:	Shared libraries for %{name}
 Group:		System/Libraries
+%rename %{oldlibqhull}
 
 %description -n %{libqhull}
 Qhull computes convex hulls, Delaunay triangulations, Voronoi diagrams,
