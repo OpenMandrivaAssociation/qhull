@@ -9,15 +9,18 @@
 
 Name:		qhull
 Version:	2020.8.0.2
-Release:	2
+Release:	3
 Summary:	Compute convex hulls
 License:	GPL
 Group:		System/Libraries
 URL:		https://www.qhull.org/
+# See also https://github.com/qhull/qhull
 Source0:	http://www.qhull.org/download/%{name}-%(echo %{version} |cut -d. -f1)-src-%(echo %{version} |cut -d. -f2-).tgz
 Patch0:		qhull-2020-8.0.2-fix_path.patch
 Source100:	qhull.rpmlintrc
-BuildRequires:	cmake ninja
+BuildSystem:	cmake
+BuildOption:	-DBUILD_SHARED_LIBS:BOOL=%{?with_shared_lib:ON}%{?!with_shared_lib:OFF}
+BuildOption:	-DBUILD_STATIC_LIBS:BOOL=%{?with_static_lib:ON}%{?!with_static_lib:OFF}
 
 %description
 Qhull computes convex hulls, Delaunay triangulations, halfspace
@@ -100,19 +103,3 @@ Header files and static library for development with %{name}.
 %files -n %{libqhull_static_devel}
 %{_libdir}/*.a
 %endif
-
-#---------------------------------------------------------------------------
-
-%prep
-%autosetup -p1 -n %{name}-%(echo %{version} |cut -d. -f1).%(echo %{version} |cut -d. -f4)
-
-%build
-%cmake \
-	-DBUILD_SHARED_LIBS:BOOL=%{?with_shared_lib:ON}%{?!with_shared_lib:OFF} \
-	-DBUILD_STATIC_LIBS:BOOL=%{?with_static_lib:ON}%{?!with_static_lib:OFF} \
-	-GNinja
-%ninja_build
-
-%install
-%ninja_install -C build
-
